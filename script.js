@@ -1,7 +1,11 @@
+let loader = document.querySelector(".loader");
 let countriesButtons = document.querySelector(".countriesButtons");
 let continentsButtons = document.querySelector(".continentsButtons");
 let continents = document.querySelector("#continents");
-
+let errorMes = document.querySelector(".errorMes");
+errorMes.style.display = "none";
+let btnContinent = document.querySelectorAll(".btnContinent");
+let arrOfCountryButton = [];
 const ctx = document.getElementById("myChart");
 let arrOfContinentsCountry = [];
 let arrOfPopulationsCountry = [];
@@ -13,6 +17,12 @@ continentsButtons.addEventListener("click", getContinent);
 countriesButtons.addEventListener("click", getCountry);
 
 async function getContinent(e) {
+  btnContinent.forEach((btn) => {
+    btn.style.border = "none";
+  });
+  if (e.target.value !== undefined) {
+    e.target.style.border = "2px solid red";
+  }
   countriesButtons.style.visibility = "visible";
   arrOfContinentsCountry = [];
   arrOfPopulationsCountry = [];
@@ -32,8 +42,12 @@ async function getContinent(e) {
       arrOfContinentsCountry.push(oCD.name.common);
       arrOfPopulationsCountry.push(oCD.population);
       let btnOfCountry = document.createElement("button");
+      btnOfCountry.style.border = "2px solid #fff";
+      btnOfCountry.style.borderRadius = "0.5rem";
+      btnOfCountry.style.background = "#fff";
       btnOfCountry.classList.add("btnContinent");
       btnOfCountry.innerText = `${oCD.name.common}`;
+      arrOfCountryButton.push(btnOfCountry);
       countriesButtons.append(btnOfCountry);
     });
   } catch (err) {
@@ -41,12 +55,18 @@ async function getContinent(e) {
   }
 
   await draw(arrOfContinentsCountry, arrOfPopulationsCountry);
-
-  //ctx.appendChild(Chart);
 }
 
 async function getCountry(event) {
-  countriesButtons.style.visibility = "none";
+  if (event.target.className === "btnContinent") {
+    arrOfCountryButton.forEach((btnCountry) => {
+      btnCountry.style.border = "2px solid #fff";
+    });
+    event.target.style.border = "2px solid purple ";
+  }
+  ctx.style.visibility = "visible";
+  errorMes.style.display = "none";
+  //countriesButtons.style.visibility = "hidden";
 
   const res = await fetch(
     "https://countriesnow.space/api/v0.1/countries/population/cities/filter",
@@ -64,7 +84,11 @@ async function getCountry(event) {
       }),
     }
   );
-  if (!res.ok) throw new Error("error");
+  if (!res.ok) {
+    errorMes.style.display = "block";
+    ctx.style.visibility = "hidden";
+    throw new Error("error");
+  }
   const data1 = await res.json();
   console.log(data1.data[1]);
   data1.data.forEach((city) => {
@@ -72,11 +96,11 @@ async function getCountry(event) {
     arrOfPopulationsCities.push(city.populationCounts[0].value);
   });
   await draw(arrOfCities, arrOfPopulationsCities);
-  console.log(arrOfCities);
-  console.log(arrOfPopulationsCities);
 }
 
-async function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
+function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
+  arrOfCities = [];
+  arrOfPopulationsCities = [];
   if (isChart === true) {
     myChart.destroy();
   }
@@ -87,7 +111,7 @@ async function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
       labels: arrOfContinentsCountry,
       datasets: [
         {
-          label: "# of Population",
+          label: "Population",
           data: arrOfPopulationsCountry,
           borderWidth: 1,
         },
@@ -101,4 +125,18 @@ async function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
       },
     },
   });
+}
+////////////////////////////
+//       spinner         //
+///////////////////////////
+
+function displayLoading() {
+  loader.classList.add("display");
+  setTimeout(() => {
+    loader.classList.remove("display");
+  }, 5000);
+}
+
+function hiddenLoading() {
+  loader.classList.remove("display");
 }

@@ -1,8 +1,8 @@
-let loader = document.querySelector(".loader");
 let countriesButtons = document.querySelector(".countriesButtons");
 let continentsButtons = document.querySelector(".continentsButtons");
 let continents = document.querySelector("#continents");
 let errorMes = document.querySelector(".errorMes");
+
 errorMes.style.display = "none";
 let btnContinent = document.querySelectorAll(".btnContinent");
 let arrOfCountryButton = [];
@@ -30,6 +30,7 @@ async function getContinent(e) {
   arrOfPopulationsCities = [];
 
   countriesButtons.innerHTML = " ";
+
   try {
     let continentData = await fetch(
       `https://restcountries.com/v3.1/region/${e.target.value}`
@@ -125,18 +126,4 @@ function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
       },
     },
   });
-}
-////////////////////////////
-//       spinner         //
-///////////////////////////
-
-function displayLoading() {
-  loader.classList.add("display");
-  setTimeout(() => {
-    loader.classList.remove("display");
-  }, 5000);
-}
-
-function hiddenLoading() {
-  loader.classList.remove("display");
 }

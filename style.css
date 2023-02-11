@@ -47,17 +47,26 @@ h1 {
   justify-content: center;
   position: relative;
 }
-.continentsButtons {
+.continentsButtons,
+.years {
   width: 100%;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
-.btnContinent {
+
+.btnContinent,
+.btnYears {
   margin: 1rem;
   padding: 0.3rem 1rem;
   font-family: "Source Sans Pro", sans-serif;
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
+}
+.buttonBorder {
+  border: 2px solid red;
+}
+.nonButtonBorder {
+  border: none;
 }

@@ -1,22 +1,31 @@
+let years = document.querySelector(".years");
+let btnYears = document.querySelectorAll(".btnYears");
 let countriesButtons = document.querySelector(".countriesButtons");
 let continentsButtons = document.querySelector(".continentsButtons");
 let continents = document.querySelector("#continents");
 let errorMes = document.querySelector(".errorMes");
-
-errorMes.style.display = "none";
 let btnContinent = document.querySelectorAll(".btnContinent");
-let arrOfCountryButton = [];
 const ctx = document.getElementById("myChart");
+let arrOfCountryButton = [];
 let arrOfContinentsCountry = [];
 let arrOfPopulationsCountry = [];
 let arrOfCities = [];
 let arrOfPopulationsCities = [];
 let isChart = false;
+let whichYear = 0;
 let myChart;
+let data1;
+
+years.style.visibility = "hidden";
+errorMes.style.display = "none";
+
 continentsButtons.addEventListener("click", getContinent);
 countriesButtons.addEventListener("click", getCountry);
 
+years.addEventListener("click", changeYear);
+
 async function getContinent(e) {
+  years.style.visibility = "hidden";
   btnContinent.forEach((btn) => {
     btn.style.border = "none";
   });
@@ -55,10 +64,14 @@ async function getContinent(e) {
     console.error(err);
   }
 
-  await draw(arrOfContinentsCountry, arrOfPopulationsCountry);
+  await drawChart(arrOfContinentsCountry, arrOfPopulationsCountry);
 }
 
 async function getCountry(event) {
+  arrOfPopulationsCities = [];
+  arrOfCities = [];
+  years.style.visibility = "visible";
+
   if (event.target.className === "btnContinent") {
     arrOfCountryButton.forEach((btnCountry) => {
       btnCountry.style.border = "2px solid #fff";
@@ -67,7 +80,6 @@ async function getCountry(event) {
   }
   ctx.style.visibility = "visible";
   errorMes.style.display = "none";
-  //countriesButtons.style.visibility = "hidden";
 
   const res = await fetch(
     "https://countriesnow.space/api/v0.1/countries/population/cities/filter",
@@ -90,16 +102,44 @@ async function getCountry(event) {
     ctx.style.visibility = "hidden";
     throw new Error("error");
   }
-  const data1 = await res.json();
+  data1 = await res.json();
   console.log(data1.data[1]);
+  btnYears.forEach((someYear) => {
+    someYear.style.border = "none";
+  });
+  btnYears[0].style.border = "2px solid red";
+  whichYear = 0;
   data1.data.forEach((city) => {
     arrOfCities.push(city.city);
     arrOfPopulationsCities.push(city.populationCounts[0].value);
   });
-  await draw(arrOfCities, arrOfPopulationsCities);
+  await drawChart(arrOfCities, arrOfPopulationsCities);
 }
 
-function draw(arrOfContinentsCountry, arrOfPopulationsCountry) {
+function changeYear(eClick) {
+  btnYears.forEach((someYear) => {
+    someYear.style.border = "none";
+  });
+  eClick.target.style.border = "2px solid red";
+  btnYears.forEach((x, index) => {
+    if (x.value === eClick.target.value) whichYear = index;
+  });
+  if (data1.data[1].populationCounts.length > whichYear) {
+    errorMes.style.display = "none";
+    arrOfPopulationsCities = [];
+    arrOfCities = [];
+    data1.data.forEach((city) => {
+      arrOfCities.push(city.city);
+      arrOfPopulationsCities.push(city.populationCounts[whichYear].value);
+    });
+    drawChart(arrOfCities, arrOfPopulationsCities);
+    console.log("whichYear:", whichYear);
+  } else {
+    errorMes.style.display = "block";
+  }
+}
+
+function drawChart(arrOfContinentsCountry, arrOfPopulationsCountry) {
   arrOfCities = [];
   arrOfPopulationsCities = [];
   if (isChart === true) {

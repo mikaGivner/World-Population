@@ -6,9 +6,6 @@
 }
 #forGraph {
   width: 40rem;
-  /* height: 20rem; */
-  /* display: flex;
-  justify-content: center; */
 }
 body {
   width: 100vw;
@@ -69,4 +66,10 @@ h1 {
 }
 .nonButtonBorder {
   border: none;
+}
+
+@media (max-width: 700px) {
+  #forGraph {
+    width: 20rem;
+  }
 }
